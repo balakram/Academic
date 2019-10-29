@@ -1,0 +1,205 @@
+-- phpMyAdmin SQL Dump
+-- version 4.6.5.2
+-- https://www.phpmyadmin.net/
+--
+-- Host: 127.0.0.1
+-- Generation Time: Jul 30, 2019 at 07:06 PM
+-- Server version: 10.1.21-MariaDB
+-- PHP Version: 7.1.1
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Database: `academy`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `branch`
+--
+
+CREATE TABLE `branch` (
+  `branchid` int(11) NOT NULL,
+  `branchname` varchar(50) COLLATE utf8_bin DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+--
+-- Dumping data for table `branch`
+--
+
+INSERT INTO `branch` (`branchid`, `branchname`) VALUES
+(1, 'Computer Science and Engineering'),
+(3, 'mechanical'),
+(4, 'Computer Science'),
+(5, 'bcd'),
+(6, 'ef'),
+(7, '');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `fees`
+--
+
+CREATE TABLE `fees` (
+  `feesid` int(11) NOT NULL,
+  `branchid` int(11) DEFAULT NULL,
+  `feesamount` int(11) DEFAULT NULL,
+  `semester` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+--
+-- Dumping data for table `fees`
+--
+
+INSERT INTO `fees` (`feesid`, `branchid`, `feesamount`, `semester`) VALUES
+(6, 3, 1000, 2),
+(7, 1, 5000, 3),
+(8, 3, 5000, 4);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `feesrcpt`
+--
+
+CREATE TABLE `feesrcpt` (
+  `feesid` int(11) NOT NULL,
+  `stdid` int(11) DEFAULT NULL,
+  `stdname` varchar(30) COLLATE utf8_bin NOT NULL,
+  `branchname` varchar(20) COLLATE utf8_bin NOT NULL,
+  `semester` int(11) DEFAULT NULL,
+  `amountrcvd` int(11) DEFAULT NULL,
+  `rcpttime` varchar(20) COLLATE utf8_bin DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+--
+-- Dumping data for table `feesrcpt`
+--
+
+INSERT INTO `feesrcpt` (`feesid`, `stdid`, `stdname`, `branchname`, `semester`, `amountrcvd`, `rcpttime`) VALUES
+(7, 0, '', '', 0, 5000, NULL),
+(8, 0, '', '', 0, 5000, NULL),
+(9, 4, '', '', 0, 5000, NULL),
+(10, 4, '', '', 0, 5000, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `student`
+--
+
+CREATE TABLE `student` (
+  `stdid` int(11) NOT NULL,
+  `stdregno` varchar(20) COLLATE utf8_bin DEFAULT NULL,
+  `stdname` varchar(50) COLLATE utf8_bin DEFAULT NULL,
+  `stdaddress` varchar(100) COLLATE utf8_bin DEFAULT NULL,
+  `stdphn` varchar(20) COLLATE utf8_bin DEFAULT NULL,
+  `branchid` int(11) DEFAULT NULL,
+  `semester` int(20) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+--
+-- Dumping data for table `student`
+--
+
+INSERT INTO `student` (`stdid`, `stdregno`, `stdname`, `stdaddress`, `stdphn`, `branchid`, `semester`) VALUES
+(3, 'abc124', 'Biswajit Behera', 'Bhubaneswar', '7328075691', 3, 2),
+(4, 'abcd1', 'izdv', 'Bhubaneswar', '286437', 3, 4);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user`
+--
+
+CREATE TABLE `user` (
+  `userid` int(11) NOT NULL,
+  `name` varchar(30) COLLATE utf8_bin NOT NULL,
+  `username` varchar(50) COLLATE utf8_bin DEFAULT NULL,
+  `userpwd` varchar(50) COLLATE utf8_bin DEFAULT NULL,
+  `userrole` varchar(30) COLLATE utf8_bin DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+--
+-- Dumping data for table `user`
+--
+
+INSERT INTO `user` (`userid`, `name`, `username`, `userpwd`, `userrole`) VALUES
+(2, 'Biswajit', 'Biswajit123', 'abcd123', '1'),
+(4, 'abcd', 'abcd12', 'abc123', '2');
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `branch`
+--
+ALTER TABLE `branch`
+  ADD PRIMARY KEY (`branchid`);
+
+--
+-- Indexes for table `fees`
+--
+ALTER TABLE `fees`
+  ADD PRIMARY KEY (`feesid`);
+
+--
+-- Indexes for table `feesrcpt`
+--
+ALTER TABLE `feesrcpt`
+  ADD PRIMARY KEY (`feesid`);
+
+--
+-- Indexes for table `student`
+--
+ALTER TABLE `student`
+  ADD PRIMARY KEY (`stdid`);
+
+--
+-- Indexes for table `user`
+--
+ALTER TABLE `user`
+  ADD PRIMARY KEY (`userid`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `branch`
+--
+ALTER TABLE `branch`
+  MODIFY `branchid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+--
+-- AUTO_INCREMENT for table `fees`
+--
+ALTER TABLE `fees`
+  MODIFY `feesid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+--
+-- AUTO_INCREMENT for table `feesrcpt`
+--
+ALTER TABLE `feesrcpt`
+  MODIFY `feesid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+--
+-- AUTO_INCREMENT for table `student`
+--
+ALTER TABLE `student`
+  MODIFY `stdid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+--
+-- AUTO_INCREMENT for table `user`
+--
+ALTER TABLE `user`
+  MODIFY `userid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

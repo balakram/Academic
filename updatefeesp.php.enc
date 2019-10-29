@@ -1,0 +1,206 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<?php
+// Include config file
+require_once "config.php";
+ 
+// Define variables and initialize with empty values
+$feesamount = "";
+$feesamount_err = "";
+// Processing form data when form is submitted
+if(isset($_POST["id"]) && !empty($_POST["id"]) && $_SERVER['REQUEST_METHOD']=='POST')
+{
+	
+    // Validate name
+    $input_feesamount = trim($_POST["feesamount"]);
+	$feesid = trim($_POST["id"]);
+    if(empty($input_feesamount))
+	{
+        $feesamount_err = "Please enter amount";
+    } elseif(!filter_var($input_feesamount, FILTER_VALIDATE_REGEXP, array("options"=>array("regexp"=>"/^[a-zA-Z0-9\s]+$/")))){
+        $feesamount_err = "Please enter amount";
+    } 
+	else
+	{
+        $feesamount = $input_feesamount;
+    }
+    
+
+    // Check input errors before inserting in database
+    if(empty($feesamount_err))
+	{
+        // Prepare an update statement
+		
+        $sql = "UPDATE fees SET feesamount=? WHERE feesid=?";
+ 
+        if($stmt = $mysqli->prepare($sql))
+		{
+            // Bind variables to the prepared statement as parameters
+            $stmt->bind_param("si", $param_feesamount, $param_id);
+            
+            // Set parameters
+            $param_feesamount= $feesamount;
+            
+            $param_id = $feesid;
+			/*
+			print_r($_SERVER);
+echo "GDGDGDG";
+		exit();
+			*/
+            
+            // Attempt to execute the prepared statement
+            if($stmt->execute())
+			{
+                
+				// Records updated successfully. Redirect to landing page
+                header("location:branch.php");
+                exit();
+            } 
+			else
+			{
+                echo "Something went wrong. Please try again later.";
+            }
+        }
+         
+        // Close statement
+        $stmt->close();
+    }
+    
+    // Close connection
+    $mysqli->close();
+} 
+else
+{
+    // Check existence of id parameter before processing further
+    if(isset($_GET["id"]) && !empty(trim($_GET["id"]))){
+        // Get URL parameter
+        $id =  trim($_GET["id"]);
+        
+        // Prepare a select statement
+        $sql = "SELECT * FROM fees WHERE feesid = ?";
+        if($stmt = $mysqli->prepare($sql)){
+            // Bind variables to the prepared statement as parameters
+            $stmt->bind_param("i", $param_id);
+            
+            // Set parameters
+            $param_id = $id;
+            
+            // Attempt to execute the prepared statement
+            if($stmt->execute())
+{
+                $result = $stmt->get_result();
+                
+                if($result->num_rows == 1)
+	{
+                    /* Fetch result row as an associative array. Since the result set
+                    contains only one row, we don't need to use while loop */
+                    $row = $result->fetch_array(MYSQLI_ASSOC);
+                    
+                    // Retrieve individual field value
+                    $feesamount = $row["feesamount"];
+                   
+          } else
+{
+                    // URL doesn't contain valid id. Redirect to error page
+                    header("location: error.php");
+                    exit();
+                }
+                
+            } else{
+                echo "Oops! Something went wrong. Please try again later.";
+            }
+        }
+        
+        // Close statement
+        $stmt->close();
+        
+        // Close connection
+        $mysqli->close();
+    }  else{
+        // URL doesn't contain id parameter. Redirect to error page
+        header("location: error.php");
+        exit();
+    }
+}
+?>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title>Untitled Document</title>
+<style type="text/css">
+<!--
+.style1 {
+	font-family: Arial, Helvetica, sans-serif;
+	font-weight: bold;
+	font-size: 36px;
+	color: #330066;
+}
+.style3 {color: #0000FF}
+.style4 {color: #FFFFFF}
+.style6 {font-family: "Times New Roman", Times, serif}
+.style9 {color: #FF00FF}
+.style10 {color: #FF0000}
+-->
+</style>
+</head>
+
+<body>
+<table width="980" height="552" border="1" cellpadding="10" cellspacing="0">
+  <tr>
+    <td colspan="2" bgcolor="#663333" ><div align="center" class="style1 style4 style6">STUDENT  ACADEMIC  FEES </div></td>
+  </tr>
+  <tr>
+    <td width="84" bgcolor="#999900"><span class="style4"><a href="branchmenu.php">BRANCH</a></span></td>
+    <td width="850" rowspan="5" bgcolor="#00FFFF">
+<body>
+    <div class="wrapper">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="page-header">
+                        <h2 align="center" class="style17 style9">Update Fees </h2>
+                    </div>
+                    <p align="center" class="style16 style10">Please edit amount to update fees </p>
+                    <form action="updatefeesp.php" method="post">
+                      <div class="form-group <?php echo (!empty($feesamount_err)) ? 'has-error' : ''; ?>"> <span class="style14">
+                        <label>
+                          <div align="center"><strong>FeesAmount</strong>
+                            <input type="text" name="feesamount" class="form-control" value="<?php echo $feesamount; ?>" />
+                            <span class="help-block"><?php echo $feesamount_err;?></span></div>
+                      </label>
+                          </span>
+                        <div align="center"></div>
+                      </div>
+                        <div align="center">
+                          <input type="hidden" name="id" value="<?php echo $id; ?>"/>
+                          <input name="submit" type="submit" class="style14" value="Submit" />
+                          <a href="updatefees.php" class="btn btn-default style14"> Cancel</a>
+                            </div>
+                    </form>
+                </div>
+            </div>        
+        </div>
+    </div>
+</body>
+	
+	</td>
+  </tr>
+  <tr>
+    <td bgcolor="#FF00CC"><span class="style4"><a href="feesmenu.php">FEES</a></span></td>
+  </tr>
+  <tr>
+    <td bgcolor="#CCFF33"><span class="style3 style4"><a href="student.php">STUDENT</a></span></td>
+  </tr>
+  <tr>
+    <td bgcolor="#00FFFF"><span class="style3 style4"><a href="feesrcpt.php">FEESRCPT</a></span></td>
+  </tr>
+  <tr>
+    <td bgcolor="#00FF00"><span class="style4"><a href="user.php">USER</a></span></td>
+  </tr>
+  
+</table>
+
+
+</body>
+</html>

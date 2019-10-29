@@ -1,0 +1,207 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<?php
+// Include config file
+require_once "config.php";
+ 
+// Define variables and initialize with empty values
+$branch= "";
+$branch_err = "";
+ 
+// Processing form data when form is submitted
+if(isset($_POST["id"]) && !empty($_POST["id"])){
+    // Get hidden input value
+    $id = $_POST["id"];
+    
+    // Validate name
+    $input_name = trim($_POST["branch"]);
+    if(empty($input_name)){
+        $name_err = "Please enter a name.";
+    } elseif(!filter_var($input_name, FILTER_VALIDATE_REGEXP, array("options"=>array("regexp"=>"/^[a-zA-Z\s]+$/")))){
+        $name_err = "Please enter a valid name.";
+    } else{
+        $name = $input_name;
+    }
+    
+    // Validate address address
+    $input_address = trim($_POST["address"]);
+    if(empty($input_address)){
+        $address_err = "Please enter an address.";     
+    } else{
+        $address = $input_address;
+    }
+    
+    // Validate salary
+    $input_salary = trim($_POST["salary"]);
+    if(empty($input_salary)){
+        $salary_err = "Please enter the salary amount.";     
+    } elseif(!ctype_digit($input_salary)){
+        $salary_err = "Please enter a positive integer value.";
+    } else{
+        $salary = $input_salary;
+    }
+    
+    // Check input errors before inserting in database
+    if(empty($name_err) && empty($address_err) && empty($salary_err)){
+        // Prepare an update statement
+        $sql = "UPDATE employees SET name=?, address=?, salary=? WHERE id=?";
+ 
+        if($stmt = $mysqli->prepare($sql)){
+            // Bind variables to the prepared statement as parameters
+            $stmt->bind_param("sssi", $param_name, $param_address, $param_salary, $param_id);
+            
+            // Set parameters
+            $param_name = $name;
+            $param_address = $address;
+            $param_salary = $salary;
+            $param_id = $id;
+            
+            // Attempt to execute the prepared statement
+            if($stmt->execute()){
+                // Records updated successfully. Redirect to landing page
+                header("location: index.php");
+                exit();
+            } else{
+                echo "Something went wrong. Please try again later.";
+            }
+        }
+         
+        // Close statement
+        $stmt->close();
+    }
+    
+    // Close connection
+    $mysqli->close();
+} else{
+    // Check existence of id parameter before processing further
+    if(isset($_GET["id"]) && !empty(trim($_GET["id"]))){
+        // Get URL parameter
+        $id =  trim($_GET["id"]);
+        
+        // Prepare a select statement
+        $sql = "SELECT * FROM employees WHERE id = ?";
+        if($stmt = $mysqli->prepare($sql)){
+            // Bind variables to the prepared statement as parameters
+            $stmt->bind_param("i", $param_id);
+            
+            // Set parameters
+            $param_id = $id;
+            
+            // Attempt to execute the prepared statement
+            if($stmt->execute()){
+                $result = $stmt->get_result();
+                
+                if($result->num_rows == 1){
+                    /* Fetch result row as an associative array. Since the result set
+                    contains only one row, we don't need to use while loop */
+                    $row = $result->fetch_array(MYSQLI_ASSOC);
+                    
+                    // Retrieve individual field value
+                    $name = $row["name"];
+                    $address = $row["address"];
+                    $salary = $row["salary"];
+                } else{
+                    // URL doesn't contain valid id. Redirect to error page
+                    header("location: error.php");
+                    exit();
+                }
+                
+            } else{
+                echo "Oops! Something went wrong. Please try again later.";
+            }
+        }
+        
+        // Close statement
+        $stmt->close();
+        
+        // Close connection
+        $mysqli->close();
+    }  else{
+        // URL doesn't contain id parameter. Redirect to error page
+        header("location: error.php");
+        exit();
+    }
+}
+?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title>Untitled Document</title>
+<style type="text/css">
+<!--
+.style1 {
+	font-family: Arial, Helvetica, sans-serif;
+	font-weight: bold;
+	font-size: 36px;
+	color: #330066;
+}
+.style3 {color: #0000FF}
+.style4 {color: #FFFFFF}
+.style6 {font-family: "Times New Roman", Times, serif}
+-->
+</style>
+</head>
+
+<body>
+<table width="980" height="552" border="1" cellpadding="10" cellspacing="0">
+  <tr>
+    <td colspan="2" bgcolor="#663333" ><div align="center" class="style1 style4 style6">STUDENT  ACADEMIC  FEES </div></td>
+  </tr>
+  <tr>
+    <td width="84" bgcolor="#999900"><span class="style4"><a href="branch.php">BRANCH</a></span></td>
+    <td width="850" rowspan="5" bgcolor="#00FFFF">
+	<body>
+    <div class="wrapper">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="page-header">
+                        <h2>Update Record</h2>
+                    </div>
+                    <p>Please edit the input values and submit to update the record.</p>
+                    <form action="<?php echo htmlspecialchars(basename($_SERVER['REQUEST_URI'])); ?>" method="post">
+                        <div class="form-group <?php echo (!empty($name_err)) ? 'has-error' : ''; ?>">
+                            <label>Name</label>
+                            <input type="text" name="name" class="form-control" value="<?php echo $name; ?>">
+                            <span class="help-block"><?php echo $name_err;?></span>
+                        </div>
+                        <div class="form-group <?php echo (!empty($address_err)) ? 'has-error' : ''; ?>">
+                            <label>Address</label>
+                            <textarea name="address" class="form-control"><?php echo $address; ?></textarea>
+                            <span class="help-block"><?php echo $address_err;?></span>
+                        </div>
+                        <div class="form-group <?php echo (!empty($salary_err)) ? 'has-error' : ''; ?>">
+                            <label>Salary</label>
+                            <input type="text" name="salary" class="form-control" value="<?php echo $salary; ?>">
+                            <span class="help-block"><?php echo $salary_err;?></span>
+                        </div>
+                        <input type="hidden" name="id" value="<?php echo $id; ?>"/>
+                        <input type="submit" class="btn btn-primary" value="Submit">
+                        <a href="index.php" class="btn btn-default">Cancel</a>
+                    </form>
+                </div>
+            </div>        
+        </div>
+    </div>
+</body>
+
+	
+	</td>
+  </tr>
+  <tr>
+    <td bgcolor="#FF00CC"><span class="style4"><a href="fees.php">FEES</a></span></td>
+  </tr>
+  <tr>
+    <td bgcolor="#CCFF33"><span class="style3 style4"><a href="student.php">STUDENT</a></span></td>
+  </tr>
+  <tr>
+    <td bgcolor="#00FFFF"><span class="style3 style4"><a href="feesrcpt.php">FEESRCPT</a></span></td>
+  </tr>
+  <tr>
+    <td bgcolor="#00FF00"><span class="style4"><a href="user.php">USER</a></span></td>
+  </tr>
+  
+</table>
+
+
+</body>
+</html>

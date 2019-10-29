@@ -1,0 +1,225 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<?php
+// Include config file
+require_once "config.php";
+ 
+// Define variables and initialize with empty values
+$name=$username=$userpwd=$userrole="";
+$name_err=$username_err=$userpwd_err=$userrole_err= "";
+ 
+// Processing form data when form is submitted
+if($_SERVER["REQUEST_METHOD"] == "POST"){
+	$userrole = trim($_POST["userrole"]);
+	
+	
+    // Validate name
+    $input_name = trim($_POST["name"]);
+    if(empty($input_name))
+	{
+        $name_err = "Please enter a name.";
+    }
+	 elseif(!filter_var($input_name, FILTER_VALIDATE_REGEXP, array("options"=>array("regexp"=>"/^[a-zA-Z\s]+$/"))))
+	 {
+        $name_err = "Please enter a valid name.";
+    } 
+	else
+	{
+        $name = $input_name;
+    }
+	
+	//validate username
+	$input_username = trim($_POST["username"]);
+    if(empty($input_username))
+	{
+        $username_err = "Please enter a username";
+    }
+	 elseif(!filter_var($input_username, FILTER_VALIDATE_REGEXP, array("options"=>array("regexp"=>"/^[a-zA-Z0-9\s]+$/"))))
+	 {
+        $username_err = "Please enter a valid username.";
+    } 
+	else
+	{
+        $username = $input_username;
+    }
+	
+	//validate password
+	$input_userpwd = trim($_POST["userpwd"]);
+    if(empty($input_userpwd))
+	{
+        $userpwd_err = "Please enter a password";
+    }
+	 elseif(!filter_var($input_userpwd, FILTER_VALIDATE_REGEXP, array("options"=>array("regexp"=>"/^[a-zA-Z0-9\s]+$/"))))
+	 {
+        $userpwd_err = "Please enter a valid password";
+    } 
+	else
+	{
+        $userpwd = $input_userpwd;
+    }
+    
+	//validate userrole
+	 
+   
+    
+    // Check input errors before inserting in database
+    if(empty($name_err) && empty($username_err) && empty($userpwd_err) && empty($userrole_err))
+	{
+	
+        // Prepare an insert statement
+        $sql = "INSERT INTO user (name,username,userpwd,userrole) VALUES (?,?,?,?)";
+ 
+        if($stmt = $mysqli->prepare($sql))
+		{
+           echo"hhh";// Set parameters
+            $param_name = $name;
+			$param_username = $username;
+			$param_userpwd = $userpwd;
+			$param_userrole = $userrole;
+		    // Bind variables to the prepared statement as parameters
+            $stmt->bind_param('ssss',$param_name,$param_username,$param_userpwd,$param_userrole);
+            
+            
+                      
+            // Attempt to execute the prepared statement
+            if($stmt->execute())
+			{
+                // Records created successfully. Redirect to landing page
+                header("location: branch.php");
+                exit();
+             } 
+		  else
+		  {
+                echo "Something went wrong. Please try again later.";
+           }
+		   // Close statement
+        $stmt->close();
+        }
+         
+        
+    }
+    
+    // Close connection
+    $mysqli->close();
+}
+?>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title>Untitled Document</title>
+<style type="text/css">
+<!--
+.style1 {
+	font-family: Arial, Helvetica, sans-serif;
+	font-weight: bold;
+	font-size: 36px;
+	color: #330066;
+}
+.style3 {color: #0000FF}
+.style4 {color: #FFFFFF}
+.style6 {font-family: "Times New Roman", Times, serif}
+.style7 {color: #FF0000}
+.style8 {color: #0000CC}
+-->
+</style>
+</head>
+
+<body>
+<table width="980" height="552" border="1" cellpadding="10" cellspacing="0">
+  <tr>
+    <td colspan="2" bgcolor="#663333" ><div align="center" class="style1 style4 style6">STUDENT  ACADEMIC  FEES </div></td>
+  </tr>
+  <tr>
+    <td width="84" bgcolor="#999900"><span class="style4"><a href="branchmenu.php">BRANCH</a></span></td>
+    <td width="850" rowspan="5" bgcolor="#00FFFF">
+	
+	
+	<body>
+    <div class="wrapper">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="page-header">
+                        <h2 align="center" class="style7"><span class="style8">USER REGESTRATION</span></h2>
+                  </div>
+                    <p align="center" class="style7">Please fill this form and submit to add user to the database.</p>
+                    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
+                                             
+                      <div class="form-group <?php echo (!empty($name_err)) ? 'has-error' : ''; ?>">
+                          <label>
+                            <div align="center">Name
+                              <input type="text" name="name" class="form-control" value="<?php echo $name; ?>" />
+                              <span class="help-block"><?php echo $name_err;?></span></div>
+                    </label>
+                            <div align="center"></div>
+                      </div><br />
+						
+						     <div class="form-group <?php echo (!empty($username_err)) ? 'has-error' : ''; ?>">
+                          <label>
+                            <div align="center">UserName
+                              <input type="text" name="username" class="form-control" value="<?php echo $username; ?>" />
+                              <span class="help-block"><?php echo $username_err;?></span></div>
+                    </label>
+                            <div align="center"></div>
+                        </div><br />
+						
+						     <div class="form-group <?php echo (!empty($userpwd_err)) ? 'has-error' : ''; ?>">
+                          <label>
+                            <div align="center">Password
+                              <input type="password" name="userpwd" class="form-control" value="<?php echo $userpwd; ?>" />
+                              <span class="help-block"><?php echo $userpwd_err;?></span></div>
+                    </label>
+                            <div align="center"></div>
+                        </div><br />
+						
+						<div class="form-group <?php echo (!empty($suserrole_err)) ? 'has-error' : ''; ?>">
+                            <label></label>
+					        <label>
+					        <div align="center">User Role
+							
+					          <select name="userrole">
+					            <option selected="selected">User Type</option>
+					            <option value="1">Administrator</option>
+					            <option value="2">Operator</option>
+			                  </select>
+					        </div>
+					        </label>
+					  </div>
+						<br />
+						
+                        <div align="center">
+                          <input type="submit" class="btn btn-primary" value="Submit">
+                          <a href="menu.php" class="btn btn-default">Cancel</a>                      </div>
+                    </form>
+              </div>
+          </div>        
+      </div>
+    </div>
+</body>
+
+	
+	
+	
+	
+	</td>
+  </tr>
+  <tr>
+    <td bgcolor="#FF00CC"><span class="style4"><a href="fees.php">FEES</a></span></td>
+  </tr>
+  <tr>
+    <td bgcolor="#CCFF33"><span class="style3 style4"><a href="studentmenu.php">STUDENT</a></span></td>
+  </tr>
+  <tr>
+    <td bgcolor="#00FFFF"><span class="style3 style4"><a href="feesrcpt.php">FEESRCPT</a></span></td>
+  </tr>
+  <tr>
+    <td bgcolor="#00FF00"><span class="style4"><a href="usermenu.php">USER</a></span></td>
+  </tr>
+  
+</table>
+
+
+</body>
+</html>

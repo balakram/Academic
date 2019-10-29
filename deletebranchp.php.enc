@@ -1,0 +1,116 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<?php
+// Process delete operation after confirmation
+if(isset($_POST["id"]) && !empty($_POST["id"])){
+    // Include config file
+    require_once "config.php";
+    
+    // Prepare a delete statement
+    $sql = "DELETE FROM branch WHERE branchid = ?";
+    
+    if($stmt = $mysqli->prepare($sql)){
+        // Bind variables to the prepared statement as parameters
+        $stmt->bind_param("i", $param_id);
+        
+        // Set parameters
+        $param_id = trim($_POST["id"]);
+        
+        // Attempt to execute the prepared statement
+        if($stmt->execute()){
+            // Records deleted successfully. Redirect to landing page
+            header("location: branch.php");
+            exit();
+        } else{
+            echo "Oops! Something went wrong. Please try again later.";
+        }
+		// Close statement
+    $stmt->close();
+    }
+     
+    
+    
+    // Close connection
+    $mysqli->close();
+} else{
+    // Check existence of id parameter
+    if(empty(trim($_GET["id"]))){
+        // URL doesn't contain id parameter. Redirect to error page
+        header("location: error.php");
+        exit();
+    }
+}
+?>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title>Untitled Document</title>
+<style type="text/css">
+<!--
+.style1 {
+	font-family: Arial, Helvetica, sans-serif;
+	font-weight: bold;
+	font-size: 36px;
+	color: #330066;
+}
+.style3 {color: #0000FF}
+.style4 {color: #FFFFFF}
+.style6 {font-family: "Times New Roman", Times, serif}
+-->
+</style>
+</head>
+
+<body>
+<table width="980" height="552" border="1" cellpadding="10" cellspacing="0">
+  <tr>
+    <td colspan="2" bgcolor="#663333" ><div align="center" class="style1 style4 style6">STUDENT  ACADEMIC  FEES </div></td>
+  </tr>
+  <tr>
+    <td width="84" bgcolor="#999900"><span class="style4"><a href="branchmenu.php">BRANCH</a></span></td>
+    <td width="850" rowspan="5" bgcolor="#00FFFF">
+	<body>
+    <div class="wrapper">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="page-header">
+                        <h1 align="center">Delete Branch </h1>
+                    </div>
+                    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
+                        <div class="alert alert-danger fade in">
+                            <input type="hidden" name="id" value="<?php echo trim($_GET["id"]); ?>"/>
+                            <p align="center">Are you sure you want to delete this Branch?</p>
+                            <div align="center"><br>
+                            </div>
+                            <p align="center">
+                                <input type="submit" value="Yes" class="btn btn-danger">
+                                <a href="deletebranchl.php" class="btn btn-default">No</a>                            </p>
+                        </div>
+                    </form>
+                </div>
+            </div>        
+        </div>
+    </div>
+</body>
+
+	</td>
+  </tr>
+  <tr>
+    <td bgcolor="#FF00CC"><span class="style4"><a href="fees.php">FEES</a></span></td>
+  </tr>
+  <tr>
+    <td bgcolor="#CCFF33"><span class="style3 style4"><a href="student.php">STUDENT</a></span></td>
+  </tr>
+  <tr>
+    <td bgcolor="#00FFFF"><span class="style3 style4"><a href="feesrcpt.php">FEESRCPT</a></span></td>
+  </tr>
+  <tr>
+    <td bgcolor="#00FF00"><span class="style4"><a href="user.php">USER</a></span></td>
+  </tr>
+  
+</table>
+
+
+</body>
+</html>

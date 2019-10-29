@@ -1,0 +1,153 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<?php
+// Include config file
+
+  require_once "config.php";
+// Define variables and initialize with empty values
+
+$username=$userpwd="";
+$userpwd_err=$username_err="";
+
+// Processing form data when form is submitted
+if($_SERVER["REQUEST_METHOD"] == "POST")
+{
+
+	$username = trim($_POST["username"]);
+	$userpwd = trim($_POST["userpwd"]);
+	
+	
+	 $sql = "SELECT * from user where username='".$username."' and userpwd='".$userpwd."'";
+	 
+	 if($result = $mysqli->query($sql))
+	 {
+          if($result->num_rows < 1)
+		  {
+			
+				// Records updated successfully. Redirect to landing page
+                header("location:error.php");
+                exit();
+		  }
+				else
+				{
+					 header("location:branch.php");
+                exit();
+				}
+       } 
+			else
+			{
+                echo "Something went wrong. Please try again later.";
+            }
+			 
+      
+        // Close statement
+        $stmt->close();
+    
+    
+    // Close connection
+    $mysqli->close();
+
+}
+
+
+?>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title>Untitled Document</title>
+<style type="text/css">
+<!--
+.style1 {
+	font-family: Arial, Helvetica, sans-serif;
+	font-weight: bold;
+	font-size: 36px;
+	color: #330066;
+}
+.style3 {color: #0000FF}
+.style4 {color: #FFFFFF}
+.style6 {font-family: "Times New Roman", Times, serif}
+.style7 {color: #000000}
+-->
+</style>
+</head>
+
+<body>
+<table width="980" height="552" border="1" cellpadding="10" cellspacing="0">
+  <tr>
+    <td colspan="2" bgcolor="#663333" ><div align="center" class="style1 style4 style6">STUDENT  ACADEMIC  FEES </div></td>
+  </tr>
+  <tr>
+    <td width="84" bgcolor="#999900"><span class="style4"><a href="branchmenu.php">BRANCH</a></span></td>
+    <td width="850" rowspan="5"  bgcolor="#00FFFF" align="center" valign="middle">
+	
+	<body>
+    <div class="wrapper">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="page-header">
+                        <h2 align="center" class="style7"><span class="style8">USER LOGIN</span></h2>
+                  </div>
+                    <p align="center" class="style7">Please fill this form and LOGIN </p>
+                    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
+                                             
+                      
+						     <div class="form-group <?php echo (!empty($username_err)) ? 'has-error' : ''; ?>">
+                          <label>
+                            <div align="center">UserName
+                              <input type="text" name="username" class="form-control" value="" />
+                              <span class="help-block"><?php echo $username_err;?></span></div>
+                    </label>
+                            <div align="center"></div>
+                        </div><br />
+						
+						     <div class="form-group <?php echo (!empty($userpwd_err)) ? 'has-error' : ''; ?>">
+                          <label>
+                            <div align="center">Password
+                              <input type="password" name="userpwd" class="form-control" value="" />
+                              <span class="help-block"><?php echo $userpwd_err;?></span></div>
+                    </label>
+                            <div align="center"></div>
+                        </div><br />
+						
+						
+						<br />
+						
+                      <div align="center">
+                          <input type="submit" class="btn btn-primary" value="Login">
+                          <label>
+                          <input type="reset" name="Reset" value="Reset" />
+                          </label>
+                        <a href="usermenu.php" class="btn btn-default">Cancel</a>  
+						</div><br />
+						<p align="center" class="style7">Not a User ? <a href="user.php" class="btn btn-default">Signup</a></p>
+                    </form>
+              </div>
+          </div>        
+      </div>
+    </div>
+</body>
+
+	
+	
+	
+	
+	</td>
+  </tr>
+  <tr>
+    <td bgcolor="#FF00CC"><span class="style4"><a href="fees.php">FEES</a></span></td>
+  </tr>
+  <tr>
+    <td bgcolor="#CCFF33"><span class="style3 style4"><a href="student.php">STUDENT</a></span></td>
+  </tr>
+  <tr>
+    <td bgcolor="#00FFFF"><span class="style3 style4"><a href="feesrcpt.php">FEESRCPT</a></span></td>
+  </tr>
+  <tr>
+    <td bgcolor="#00FF00"><span class="style4"><a href="usermenu.php">USER</a></span></td>
+  </tr>
+</table>
+
+
+</body>
+</html>

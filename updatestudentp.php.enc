@@ -1,0 +1,297 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<?php
+// Include config file
+
+ require_once "config.php";
+// Define variables and initialize with empty values
+$branchname=$stdname=$stdphn=$stdaddress="";
+$branchname_err = $stdname_err=$stdphn_err=$stdaddress_err="";
+// Processing form data when form is submitted
+if(isset($_POST["id"]) && !empty($_POST["id"]) && $_SERVER['REQUEST_METHOD']=='POST')
+{
+require_once "config.php";
+	$stdname=$input_stdname;
+	$stdphn=$input_stdphn;
+	$stdaddress=$input_stdaddress;
+    // Validate branch name
+    //$input_branchname = trim($_POST["branchname"]);
+	$branchid = trim($_POST["branchid"]);
+   /* if(empty($input_branchname))
+	{
+        $branchname_err = "Please enter a branchname.";
+    } elseif(!filter_var($input_branchname, FILTER_VALIDATE_REGEXP, array("options"=>array("regexp"=>"/^[a-zA-Z\s]+$/")))){
+        $branchname_err = "Please enter a valid branchname.";
+    } 
+	else
+	{
+        $branchname = $input_branchname;
+    }*/
+    
+
+    // Check input errors before inserting in database
+    if(empty($stdname_err)&& empty($stdaddress_err) && empty($stdphn_err) && empty($branchname_err))
+	{
+        // Prepare an update statement
+		
+        $sql = "UPDATE student SET stdname=?,stdaddress=?,stdphn=?,branchid=?   WHERE stdid=?";
+		
+ 
+        if($stmt = $mysqli->prepare($sql))
+		{
+            // Bind variables to the prepared statement as parameters
+            $stmt->bind_param("ssssi", $param_stdname,  $param_stdaddress, $param_stdphn,$param_branchname, $param_id);
+            
+            // Set parameters
+            $param_stdname= $stdname;
+			$param_stdaddress= $stdaddress;
+			$param_stdphn= $stdphn;
+            $param_branchname= $branchname;
+            $param_id = $stdid;
+			/*
+			print_r($_SERVER);
+echo "GDGDGDG";
+		exit();
+			*/
+            
+            // Attempt to execute the prepared statement
+            if($stmt->execute())
+			{
+                
+				// Records updated successfully. Redirect to landing page
+                header("location:branch.php");
+                exit();
+            } 
+			else
+			{
+                echo "Something went wrong. Please try again later.";
+            }
+        }
+         
+        // Close statement
+        $stmt->close();
+    }
+    
+    // Close connection
+    $mysqli->close();
+} 
+else
+{
+    // Check existence of id parameter before processing further
+    if(isset($_GET["id"]) && !empty(trim($_GET["id"])))
+	{
+       
+	   require_once "config.php";
+	    // Get URL parameter
+        $id =  trim($_GET["id"]);
+        
+        // Prepare a select statement
+        $sql = "SELECT * FROM student WHERE stdid = ?";
+        if($stmt = $mysqli->prepare($sql))
+		{
+            // Bind variables to the prepared statement as parameters
+            $stmt->bind_param("i", $param_id);
+            
+            // Set parameters
+            $param_id = $id;
+            
+            // Attempt to execute the prepared statement
+            if($stmt->execute())
+				{
+                $result = $stmt->get_result();
+                
+                if($result->num_rows == 1)
+				{
+                    /* Fetch result row as an associative array. Since the result set
+                    contains only one row, we don't need to use while loop */
+                    $row = $result->fetch_array(MYSQLI_ASSOC);
+                    
+                    // Retrieve individual field value
+                    $stdname = $row["stdname"];
+					
+					$stdaddress = $row["stdaddress"];
+					$stdphn = $row["stdphn"];
+                   
+          		} 
+				else
+				{
+                    // URL doesn't contain valid id. Redirect to error page
+                    header("location: error.php");
+                    exit();
+                }
+                
+            	} 
+				else
+				{
+                echo "Oops! Something went wrong. Please try again later.";
+            	}
+        }
+        
+        // Close statement
+        $stmt->close();
+        
+        // Close connection
+    $mysqli->close();
+	
+    	}
+		else{
+        // URL doesn't contain id parameter. Redirect to error page
+        header("location: error.php");
+        exit();
+    }
+	
+}
+?>
+
+
+
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title>Untitled Document</title>
+<style type="text/css">
+<!--
+.style1 {
+	font-family: Arial, Helvetica, sans-serif;
+	font-weight: bold;
+	font-size: 36px;
+	color: #330066;
+}
+.style3 {color: #0000FF}
+.style4 {color: #FFFFFF}
+.style6 {font-family: "Times New Roman", Times, serif}
+.style7 {color: #000000}
+-->
+</style>
+</head>
+
+<body>
+<table width="980" height="552" border="1" cellpadding="10" cellspacing="0">
+  <tr>
+    <td colspan="2" bgcolor="#663333" ><div align="center" class="style1 style4 style6">STUDENT  ACADEMIC  FEES </div></td>
+  </tr>
+  <tr>
+    <td width="84" bgcolor="#999900"><span class="style4"><a href="branchmenu.php">BRANCH</a></span></td>
+    <td width="850" rowspan="5"  bgcolor="#00FFFF" align="center" valign="middle">
+	
+	<body>
+    <div class="wrapper">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="page-header">
+                        <h2 align="center" class="style17 style11">Update </h2>
+                    </div>
+                    <p align="center" class="style16 style10">Please edit and submit to update the branch </p>
+                    <form action="updatestudentp.php" method="post">
+                      <div class="form-group <?php echo (!empty($stdname_err)) ? 'has-error' : ''; ?>"> <span class="style14">
+                        <label>
+                          <div align="center"><strong>Student Name</strong>
+                            <input type="text" name="stdname" class="form-control" value="<?php echo $stdname; ?>" />
+                            <span class="help-block"><?php echo $stdname_err;?></span></div>
+                      </label>
+                          </span>
+                        <div align="center"></div>
+                      </div>
+					  
+					    <div class="form-group <?php echo (!empty($branchname_err)) ? 'has-error' : ''; ?>"
+						       <label>
+						      <div align="center">
+						     <span class="style17">Branch Name</span>
+						     <?php
+							
+                				 require_once "config.php"; 
+				  
+				  // Attempt select query execution
+                    $sql = "SELECT * FROM branch";
+					
+                    if($result = $mysqli->query($sql))
+					{
+                        if($result->num_rows > 0)
+						{
+							echo "<select name='branchid'>	
+					    	      <option selected='selected'>Select Branch</option>";
+							while($row = $result->fetch_array())
+							{ 
+								echo "<option value =". $row['branchid'].">".$row['branchname']."</option>";
+							
+							}
+							echo "</select>";
+                              
+                           	// Free result set
+                           	$result->free();
+                        } 
+						else
+						{
+                            echo "<p class='lead'><em>No records were found.</em></p>";
+                        }
+                    } 
+					else
+					{
+                        echo "ERROR: Could not able to execute $sql. " . $mysqli->error;
+                    }
+                    
+                    // Close connection
+                    $mysqli->close();
+				
+                    ?>
+				     </div><br />
+					  
+					   <div class="form-group <?php echo (!empty($stdaddress_err)) ? 'has-error' : ''; ?>"> <span class="style14">
+                        <label>
+                          <div align="center"><strong>Address</strong>
+                            <textarea name="stdaddress" class="form-control" value="<?php echo $stdaddress; ?>" />
+                            <span class="help-block"><?php echo $stdaddress_err;?></span></div>
+                      </label>
+                          </span>
+                        <div align="center"></div>
+                      </div>
+					  
+					  
+					  <div class="form-group <?php echo (!empty($stdphn_err)) ? 'has-error' : ''; ?>"> <span class="style14">
+                        <label>
+                          <div align="center"><strong>Phone No.</strong>
+                            <input type="text" name="stdphn" class="form-control" value="<?php echo $stdphn; ?>" />
+                            <span class="help-block"><?php echo $stdphn_err;?></span></div>
+                      </label>
+                          </span>
+                        <div align="center"></div>
+                      </div>
+					  
+                        <div align="center">
+                          <input type="hidden" name="id" value="<?php echo $id; ?>"/>
+                          <input name="submit" type="submit" class="style14" value="Submit" />
+                          <a href="updatebranchl.php" class="btn btn-default style14"> Cancel</a>
+                      </div>
+                    </form>
+                </div>
+            </div>        
+        </div>
+    </div>
+</body>
+
+	
+	
+	
+	
+	</td>
+  </tr>
+  <tr>
+    <td bgcolor="#FF00CC"><span class="style4"><a href="feesmenu.php">FEES</a></span></td>
+  </tr>
+  <tr>
+    <td bgcolor="#CCFF33"><span class="style3 style4"><a href="studentmenu.php">STUDENT</a></span></td>
+  </tr>
+  <tr>
+    <td bgcolor="#00FFFF"><span class="style3 style4"><a href="feesrcpt.php">FEESRCPT</a></span></td>
+  </tr>
+  <tr>
+    <td bgcolor="#00FF00"><span class="style4"><a href="usermenu.php">USER</a></span></td>
+  </tr>
+</table>
+
+
+</body>
+</html>
